@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Question, SingleChoiceQuestion, MultipleChoiceQuestion, TextInputQuestion, MatrixQuestion } from '../../types/question';
+import { BatchInputDialog } from './BatchInputDialog';
+import { PreviewDialog } from './PreviewDialog';
+import { parseBatchInput } from '../../lib/batchParser';
+import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
 interface ConfigurationPanelProps {
   question: Question | null;
@@ -15,7 +19,12 @@ export default function ConfigurationPanel({
   onBatchAddOptions,
   onEditScale,
 }: ConfigurationPanelProps) {
+  const { batchAddOptions, batchAddMatrixItems } = useSurveyEditor();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['basic']));
+  const [showBatchDialog, setShowBatchDialog] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewItems, setPreviewItems] = useState<string[]>([]);
+  const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
@@ -25,6 +34,33 @@ export default function ConfigurationPanel({
       newExpanded.add(section);
     }
     setExpandedSections(newExpanded);
+  };
+
+  const handleBatchPreview = (text: string, mode: 'append' | 'replace') => {
+    const items = parseBatchInput(text);
+    const isChoiceQuestion = question?.type === 'single' || question?.type === 'multiple';
+
+    if (items.length === 0) {
+      alert(isChoiceQuestion ? '请输入至少一个选项' : '请输入至少一个评价项');
+      return;
+    }
+    setPreviewItems(items);
+    setBatchMode(mode);
+    setShowBatchDialog(false);
+    setShowPreviewDialog(true);
+  };
+
+  const handleBatchConfirm = () => {
+    if (!question) return;
+
+    if (question.type === 'single' || question.type === 'multiple') {
+      batchAddOptions(question.id, previewItems.join('\n'), batchMode);
+    } else if (question.type === 'matrix') {
+      batchAddMatrixItems(question.id, previewItems.join('\n'), batchMode);
+    }
+
+    setShowPreviewDialog(false);
+    setPreviewItems([]);
   };
 
   if (!question) {
@@ -254,29 +290,39 @@ export default function ConfigurationPanel({
       {/* Batch Operations */}
       <Section id="batch" title="批量操作">
         <div className="space-y-2">
-          {(question.type === 'single' || question.type === 'multiple') && onBatchAddOptions && (
-            <button
-              onClick={onBatchAddOptions}
-              className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-            >
-              批量添加选项
-            </button>
+          {(question.type === 'single' || question.type === 'multiple') && (
+            <>
+              <button
+                onClick={() => setShowBatchDialog(true)}
+                className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+              >
+                批量添加选项...
+              </button>
+              {onBatchAddOptions && (
+                <button
+                  onClick={onBatchAddOptions}
+                  className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                >
+                  复制其他问题的选项...
+                </button>
+              )}
+            </>
           )}
 
           {question.type === 'matrix' && (
             <>
               <button
-                onClick={() => alert('批量添加评价项功能即将推出')}
+                onClick={() => setShowBatchDialog(true)}
                 className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
               >
-                批量添加评价项
+                批量添加评价项...
               </button>
               {onEditScale && (
                 <button
                   onClick={onEditScale}
                   className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                 >
-                  修改量表
+                  修改量表...
                 </button>
               )}
             </>
@@ -305,6 +351,35 @@ export default function ConfigurationPanel({
           隐藏的问题不会在问卷中显示，但可用于数据存储或逻辑判断。
         </div>
       </Section>
+
+      {/* Batch Input and Preview Dialogs */}
+      {question && (
+        <>
+          <BatchInputDialog
+            isOpen={showBatchDialog}
+            title={question.type === 'single' || question.type === 'multiple' ? '批量添加选项' : '批量添加评价项'}
+            placeholder={
+              question.type === 'single' || question.type === 'multiple'
+                ? '选项一\n选项二\n选项三'
+                : '产品的质量\n产品的外观设计\n产品的性价比'
+            }
+            onClose={() => setShowBatchDialog(false)}
+            onPreview={handleBatchPreview}
+          />
+
+          <PreviewDialog
+            isOpen={showPreviewDialog}
+            title={`预览 - 将添加以下${question.type === 'single' || question.type === 'multiple' ? '选项' : '评价项'}`}
+            items={previewItems}
+            mode={batchMode}
+            onClose={() => {
+              setShowPreviewDialog(false);
+              setShowBatchDialog(true);
+            }}
+            onConfirm={handleBatchConfirm}
+          />
+        </>
+      )}
     </div>
   );
 }
