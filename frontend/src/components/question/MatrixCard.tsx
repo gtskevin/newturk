@@ -1,6 +1,11 @@
 import { Circle } from 'lucide-react';
+import { useState } from 'react';
 import { MatrixQuestion } from '../../types/question';
 import QuestionCard from './QuestionCard';
+import { BatchInputDialog } from '../editor/BatchInputDialog';
+import { PreviewDialog } from '../editor/PreviewDialog';
+import { parseBatchInput } from '../../lib/batchParser';
+import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
 interface MatrixCardProps {
   question: MatrixQuestion;
@@ -27,6 +32,30 @@ export default function MatrixCard({
   onDeleteItem,
   onEditScale,
 }: MatrixCardProps) {
+  const { batchAddMatrixItems } = useSurveyEditor();
+  const [showBatchDialog, setShowBatchDialog] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewItems, setPreviewItems] = useState<string[]>([]);
+  const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
+
+  const handleBatchPreview = (text: string, mode: 'append' | 'replace') => {
+    const items = parseBatchInput(text);
+    if (items.length === 0) {
+      alert('请输入至少一个评价项');
+      return;
+    }
+    setPreviewItems(items);
+    setBatchMode(mode);
+    setShowBatchDialog(false);
+    setShowPreviewDialog(true);
+  };
+
+  const handleBatchConfirm = () => {
+    batchAddMatrixItems(question.id, previewItems.join('\n'), batchMode);
+    setShowPreviewDialog(false);
+    setPreviewItems([]);
+  };
+
   const renderScaleHeader = () => {
     if (question.layout === 'vertical') {
       return null;
@@ -125,12 +154,11 @@ export default function MatrixCard({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            // TODO: Open batch add dialog
-            alert('批量添加功能即将推出');
+            setShowBatchDialog(true);
           }}
-          className="text-sm text-gray-500 hover:text-gray-700"
+          className="text-sm text-orange-500 hover:text-orange-700"
         >
-          批量添加
+          批量添加评价项
         </button>
 
         <button
@@ -148,6 +176,26 @@ export default function MatrixCard({
       <div className="mt-3 text-xs text-gray-500">
         量表: {question.scale.presetName || '自定义'} ({question.scale.points.length}点)
       </div>
+
+      <BatchInputDialog
+        isOpen={showBatchDialog}
+        title="批量添加评价项"
+        placeholder="产品的质量&#10;产品的外观设计&#10;产品的性价比"
+        onClose={() => setShowBatchDialog(false)}
+        onPreview={handleBatchPreview}
+      />
+
+      <PreviewDialog
+        isOpen={showPreviewDialog}
+        title="预览 - 将添加以下评价项"
+        items={previewItems}
+        mode={batchMode}
+        onClose={() => {
+          setShowPreviewDialog(false);
+          setShowBatchDialog(true);
+        }}
+        onConfirm={handleBatchConfirm}
+      />
     </QuestionCard>
   );
 }
