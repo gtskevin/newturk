@@ -87,7 +87,7 @@ export default function QuestionReorderDialog({
                 value={mode === 'position' ? targetPosition : questionOrder + 1}
                 onChange={(e) => {
                   const val = parseInt(e.target.value);
-                  if (isNaN(val) || val < 1 || val > totalQuestions) {
+                  if (e.target.value === '' || isNaN(val) || val < 1 || val > totalQuestions) {
                     setInputError(`位置必须在 1-${totalQuestions} 之间`);
                   } else {
                     setInputError('');
