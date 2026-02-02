@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ExperimentsList from './pages/ExperimentsList';
 import CreateExperiment from './pages/CreateExperiment';
 import ExperimentDetail from './pages/ExperimentDetail';
+import QuestionnaireEditor from './pages/QuestionnaireEditor';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path="/" element={<ExperimentsList />} />
             <Route path="/create" element={<CreateExperiment />} />
             <Route path="/experiments/:id" element={<ExperimentDetail />} />
+            <Route path="/experiments/:id/edit" element={<QuestionnaireEditor />} />
           </Routes>
         </main>
 

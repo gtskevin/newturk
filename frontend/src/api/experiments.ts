@@ -122,4 +122,15 @@ export const experimentsApi = {
   deleteExperiment: async (id: string): Promise<void> => {
     await api.delete(`/experiments/${id}`);
   },
+
+  // Update experiment questions
+  updateQuestions: async (id: string, questions: Question[]): Promise<void> => {
+    await api.put(`/experiments/${id}`, { questions });
+  },
+
+  // Get experiment questions
+  getQuestions: async (id: string): Promise<Question[]> => {
+    const response = await api.get<Experiment>(`/experiments/${id}`);
+    return response.data.questions;
+  },
 };
