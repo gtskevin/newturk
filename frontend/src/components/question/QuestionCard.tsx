@@ -9,6 +9,9 @@ interface QuestionCardProps {
   onDuplicate: () => void;
   onDelete: () => void;
   onUpdateTitle: (title: string) => void;
+  isBatchSelected: boolean;
+  onBatchToggle: () => void;
+  onReorderClick: () => void;
   children: React.ReactNode;
 }
 
@@ -19,6 +22,9 @@ export default function QuestionCard({
   onDuplicate,
   onDelete,
   onUpdateTitle,
+  isBatchSelected,
+  onBatchToggle,
+  onReorderClick,
   children,
 }: QuestionCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -44,7 +50,9 @@ export default function QuestionCard({
   return (
     <div
       className={`bg-white rounded-lg shadow-sm border-2 transition-all ${
-        isSelected ? 'border-blue-500 shadow-md' : 'border-gray-200 hover:border-gray-300'
+        isSelected ? 'border-blue-500 shadow-md' :
+        isBatchSelected ? 'border-green-500 shadow-md' :
+        'border-gray-200 hover:border-gray-300'
       }`}
       onClick={onSelect}
     >
@@ -61,11 +69,31 @@ export default function QuestionCard({
             {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
           </button>
 
+          {/* NEW: Checkbox for batch selection */}
+          <input
+            type="checkbox"
+            checked={isBatchSelected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onBatchToggle();
+            }}
+            className="w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500 cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+            title="选中此题（可批量操作）"
+          />
+
           <div className="flex items-center gap-2 flex-1">
             {!question.metadata?.hideNumber && (
-              <span className="text-sm font-medium text-gray-500">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReorderClick();
+                }}
+                className="text-sm font-medium text-gray-500 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition-all cursor-pointer"
+                title="点击移动此题"
+              >
                 [{question.order}]
-              </span>
+              </button>
             )}
 
             {isEditing ? (
@@ -118,6 +146,13 @@ export default function QuestionCard({
           </button>
         </div>
       </div>
+
+      {/* NEW: Show badge if both editing and batch selected */}
+      {isSelected && isBatchSelected && (
+        <div className="px-4 py-1 bg-green-50 border-b border-green-100">
+          <span className="text-xs text-green-600 font-medium">已选</span>
+        </div>
+      )}
 
       {/* Content */}
       {!isCollapsed && (
