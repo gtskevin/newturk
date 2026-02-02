@@ -16,7 +16,6 @@ interface MatrixCardProps {
   onAddItem: () => void;
   onUpdateItem: (itemId: string, label: string) => void;
   onDeleteItem: (itemId: string) => void;
-  onEditScale: () => void;
 }
 
 export default function MatrixCard({
@@ -29,7 +28,6 @@ export default function MatrixCard({
   onAddItem,
   onUpdateItem,
   onDeleteItem,
-  onEditScale,
 }: MatrixCardProps) {
   const { batchAddMatrixItems } = useSurveyEditor();
   const [showBatchDialog, setShowBatchDialog] = useState(false);

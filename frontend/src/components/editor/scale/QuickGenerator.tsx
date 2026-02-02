@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface QuickGeneratorProps {
   onGenerate: (startValue: number, endValue: number, startLabel: string, endLabel: string) => void;

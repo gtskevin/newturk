@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { ScaleConfig, ScalePoint } from '../../types/question';
 import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
@@ -59,7 +59,7 @@ export default function ScaleEditDialog({
     }
   }, [scale, questionId, updateScale, isOpen]);
 
-  const handlePresetSelect = (name: string, presetScale: ScaleConfig) => {
+  const handlePresetSelect = (_name: string, presetScale: ScaleConfig) => {
     setScale(presetScale);
   };
 

@@ -156,7 +156,6 @@ function QuestionnaireEditorContent() {
             onDeleteItem={(itemId) => {
               console.log('Delete item:', itemId);
             }}
-            onEditScale={() => alert('量表编辑功能即将推出')}
           />
         );
       }
@@ -256,7 +255,6 @@ function QuestionnaireEditorContent() {
             }
           }}
           onBatchAddOptions={() => alert('批量添加选项功能即将推出')}
-          onEditScale={() => alert('量表编辑功能即将推出')}
         />
       </div>
     </div>

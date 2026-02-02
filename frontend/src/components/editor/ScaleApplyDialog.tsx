@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { ScaleConfig, Question, MatrixQuestion } from '../../types/question';
+import { ScaleConfig, MatrixQuestion } from '../../types/question';
 import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
 interface ScaleApplyDialogProps {
@@ -9,10 +9,6 @@ interface ScaleApplyDialogProps {
   sourceQuestionId: string;
   onClose: () => void;
   onApplied?: (count: number) => void;
-}
-
-interface MatrixQuestionWithCurrent extends MatrixQuestion {
-  current?: string; // Display string for current scale
 }
 
 export default function ScaleApplyDialog({
@@ -31,7 +27,7 @@ export default function ScaleApplyDialog({
   );
 
   // Pre-select questions with different scales
-  React.useEffect(() => {
+  useEffect(() => {
     const different = matrixQuestions
       .filter(q => JSON.stringify(q.scale) !== JSON.stringify(sourceScale))
       .map(q => q.id);

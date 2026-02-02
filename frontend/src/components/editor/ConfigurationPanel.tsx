@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Question, SingleChoiceQuestion, MultipleChoiceQuestion, TextInputQuestion, MatrixQuestion } from '../../types/question';
 import { BatchInputDialog } from './BatchInputDialog';
 import { PreviewDialog } from './PreviewDialog';
-import { ScaleEditDialog } from './ScaleEditDialog';
+import ScaleEditDialog from './ScaleEditDialog';
 import { parseBatchInput } from '../../lib/batchParser';
 import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
@@ -11,14 +11,12 @@ interface ConfigurationPanelProps {
   question: Question | null;
   onUpdateQuestion: (updates: Partial<Question>) => void;
   onBatchAddOptions?: () => void;
-  onEditScale?: () => void;
 }
 
 export default function ConfigurationPanel({
   question,
   onUpdateQuestion,
   onBatchAddOptions,
-  onEditScale,
 }: ConfigurationPanelProps) {
   const { batchAddOptions, batchAddMatrixItems } = useSurveyEditor();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['basic']));
@@ -278,14 +276,12 @@ export default function ConfigurationPanel({
             </select>
           </div>
 
-          {onEditScale && (
-            <button
-              onClick={() => setShowScaleDialog(true)}
-              className="w-full px-3 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
-            >
-              修改量表
-            </button>
-          )}
+          <button
+            onClick={() => setShowScaleDialog(true)}
+            className="w-full px-3 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
+          >
+            修改量表
+          </button>
         </Section>
       )}
 
@@ -319,14 +315,12 @@ export default function ConfigurationPanel({
               >
                 批量添加评价项...
               </button>
-              {onEditScale && (
-                <button
-                  onClick={onEditScale}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                >
-                  修改量表...
-                </button>
-              )}
+              <button
+                onClick={() => setShowScaleDialog(true)}
+                className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+              >
+                修改量表...
+              </button>
             </>
           )}
         </div>

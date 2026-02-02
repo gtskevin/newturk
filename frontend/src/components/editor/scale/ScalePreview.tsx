@@ -1,4 +1,3 @@
-import React from 'react';
 import { Circle } from 'lucide-react';
 import { ScaleConfig } from '../../../types/question';
 
