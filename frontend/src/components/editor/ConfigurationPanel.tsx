@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Question, SingleChoiceQuestion, MultipleChoiceQuestion, TextInputQuestion, MatrixQuestion } from '../../types/question';
 import { BatchInputDialog } from './BatchInputDialog';
 import { PreviewDialog } from './PreviewDialog';
+import { ScaleEditDialog } from './ScaleEditDialog';
 import { parseBatchInput } from '../../lib/batchParser';
 import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
@@ -23,6 +24,7 @@ export default function ConfigurationPanel({
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['basic']));
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [showScaleDialog, setShowScaleDialog] = useState(false);
   const [previewItems, setPreviewItems] = useState<string[]>([]);
   const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
 
@@ -278,7 +280,7 @@ export default function ConfigurationPanel({
 
           {onEditScale && (
             <button
-              onClick={onEditScale}
+              onClick={() => setShowScaleDialog(true)}
               className="w-full px-3 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
             >
               修改量表
@@ -378,6 +380,15 @@ export default function ConfigurationPanel({
             }}
             onConfirm={handleBatchConfirm}
           />
+
+          {question.type === 'matrix' && (
+            <ScaleEditDialog
+              isOpen={showScaleDialog}
+              questionId={question.id}
+              initialScale={(question as MatrixQuestion).scale}
+              onClose={() => setShowScaleDialog(false)}
+            />
+          )}
         </>
       )}
     </div>

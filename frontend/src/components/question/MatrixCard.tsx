@@ -4,6 +4,7 @@ import { MatrixQuestion } from '../../types/question';
 import QuestionCard from './QuestionCard';
 import { BatchInputDialog } from '../editor/BatchInputDialog';
 import { PreviewDialog } from '../editor/PreviewDialog';
+import { ScaleEditDialog } from '../editor/ScaleEditDialog';
 import { parseBatchInput } from '../../lib/batchParser';
 import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
@@ -35,6 +36,7 @@ export default function MatrixCard({
   const { batchAddMatrixItems } = useSurveyEditor();
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [showScaleDialog, setShowScaleDialog] = useState(false);
   const [previewItems, setPreviewItems] = useState<string[]>([]);
   const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
   const [showSuccess, setShowSuccess] = useState(false);
@@ -173,7 +175,7 @@ export default function MatrixCard({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onEditScale();
+            setShowScaleDialog(true);
           }}
           className="text-sm text-gray-500 hover:text-gray-700"
         >
@@ -205,6 +207,13 @@ export default function MatrixCard({
         }}
         onConfirm={handleBatchConfirm}
         isConfirming={isConfirming}
+      />
+
+      <ScaleEditDialog
+        isOpen={showScaleDialog}
+        questionId={question.id}
+        initialScale={question.scale}
+        onClose={() => setShowScaleDialog(false)}
       />
 
       {/* Success notification */}
