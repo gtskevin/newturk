@@ -85,6 +85,47 @@ def get_experiment(
     return experiment
 
 
+@router.get("/{experiment_id}/questions")
+def get_experiment_questions(
+    experiment_id: int, db: Session = Depends(get_db)
+) -> dict:
+    """
+    Get questions for an experiment
+
+    Args:
+        experiment_id: Experiment ID
+        db: Database session
+
+    Returns:
+        Dictionary containing questions list
+
+    Raises:
+        HTTPException: If experiment not found
+    """
+    experiment = (
+        db.query(ExperimentModel)
+        .filter(ExperimentModel.id == experiment_id)
+        .first()
+    )
+
+    if not experiment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Experiment with id {experiment_id} not found"
+        )
+
+    # Extract questions from experiment_config
+    questions = []
+    if experiment.experiment_config and "questions" in experiment.experiment_config:
+        questions = experiment.experiment_config["questions"]
+
+    return {
+        "experiment_id": experiment_id,
+        "questions": questions,
+        "total": len(questions)
+    }
+
+
 @router.put("/{experiment_id}", response_model=Experiment)
 def update_experiment(
     experiment_id: int,

@@ -172,3 +172,74 @@ def test_delete_experiment_not_found(client, test_db_session):
     response = client.delete("/api/v1/experiments/99999")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_get_experiment_questions_empty(client, test_db_session):
+    """Test getting questions from experiment with no questions via GET /api/v1/experiments/{id}/questions"""
+    experiment = ExperimentModel(
+        name="Test Experiment",
+        description="A test experiment",
+        status="draft",
+        experiment_config={}
+    )
+    test_db_session.add(experiment)
+    test_db_session.commit()
+    test_db_session.refresh(experiment)
+
+    response = client.get(f"/api/v1/experiments/{experiment.id}/questions")
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["experiment_id"] == experiment.id
+    assert data["questions"] == []
+    assert data["total"] == 0
+
+
+def test_get_experiment_questions(client, test_db_session):
+    """Test getting questions from experiment via GET /api/v1/experiments/{id}/questions"""
+    questions = [
+        {
+            "id": "q1",
+            "type": "single",
+            "title": "Question 1",
+            "required": True,
+            "order": 0,
+            "options": [
+                {"id": "opt1", "label": "Option 1", "value": "opt1", "order": 0}
+            ]
+        },
+        {
+            "id": "q2",
+            "type": "text",
+            "title": "Question 2",
+            "required": False,
+            "order": 1
+        }
+    ]
+
+    experiment = ExperimentModel(
+        name="Test Experiment",
+        description="A test experiment",
+        status="draft",
+        experiment_config={"questions": questions}
+    )
+    test_db_session.add(experiment)
+    test_db_session.commit()
+    test_db_session.refresh(experiment)
+
+    response = client.get(f"/api/v1/experiments/{experiment.id}/questions")
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["experiment_id"] == experiment.id
+    assert data["total"] == 2
+    assert len(data["questions"]) == 2
+    assert data["questions"][0]["title"] == "Question 1"
+    assert data["questions"][1]["title"] == "Question 2"
+
+
+def test_get_experiment_questions_not_found(client, test_db_session):
+    """Test getting questions from non-existent experiment via GET /api/v1/experiments/{id}/questions"""
+    response = client.get("/api/v1/experiments/99999/questions")
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
