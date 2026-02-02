@@ -1,5 +1,6 @@
 // frontend/src/components/editor/BatchInputDialog.tsx
 import React, { useState } from 'react';
+import { parseBatchInput } from '../../lib/batchParser';
 
 interface BatchInputDialogProps {
   isOpen: boolean;
@@ -18,6 +19,23 @@ export const BatchInputDialog: React.FC<BatchInputDialogProps> = ({
 }) => {
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'append' | 'replace'>('replace');
+  const [error, setError] = useState<string>('');
+
+  const handlePreview = () => {
+    if (!text.trim()) {
+      setError('请输入至少一个项目');
+      return;
+    }
+
+    const items = parseBatchInput(text);
+    if (items.length === 0) {
+      setError('输入格式无效，请检查分隔符');
+      return;
+    }
+
+    setError('');
+    onPreview(text, mode);
+  };
 
   if (!isOpen) return null;
 
@@ -34,11 +52,19 @@ export const BatchInputDialog: React.FC<BatchInputDialogProps> = ({
           </label>
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              setError('');
+            }}
             placeholder={placeholder}
             className="w-full h-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             autoFocus
           />
+          {error && (
+            <div className="mt-2 text-sm text-red-600">
+              {error}
+            </div>
+          )}
 
           <div className="mt-4 space-y-2">
             <label className="flex items-center">
@@ -72,7 +98,7 @@ export const BatchInputDialog: React.FC<BatchInputDialogProps> = ({
             取消
           </button>
           <button
-            onClick={() => onPreview(text, mode)}
+            onClick={handlePreview}
             disabled={!text.trim()}
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >

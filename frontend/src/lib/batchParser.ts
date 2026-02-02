@@ -1,5 +1,7 @@
 type Delimiter = 'newline' | 'semicolon' | 'comma' | 'tab';
 
+const MAX_ITEM_LENGTH = 200;
+
 export function detectDelimiter(text: string): Delimiter {
   const lines = text.trim().split('\n');
 
@@ -30,8 +32,8 @@ export function parseBatchInput(text: string): string[] {
   // The regex matches: newline, semicolon, comma, or tab
   const items = text.split(/\n|;|,|\t/);
 
-  // Trim whitespace and filter empty lines
+  // Trim whitespace and filter invalid items
   return items
     .map(item => item.trim())
-    .filter(item => item.length > 0);
+    .filter(item => item.length > 0 && item.length <= MAX_ITEM_LENGTH);
 }

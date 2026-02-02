@@ -65,3 +65,27 @@ describe('detectDelimiter', () => {
     expect(result).toBe('tab');
   });
 });
+
+describe('parseBatchInput - validation', () => {
+  it('should handle empty input', () => {
+    const result = parseBatchInput('');
+    expect(result).toEqual([]);
+  });
+
+  it('should handle whitespace-only input', () => {
+    const result = parseBatchInput('   \n\n   ');
+    expect(result).toEqual([]);
+  });
+
+  it('should reject items longer than 200 characters', () => {
+    const longText = 'a'.repeat(201);
+    const result = parseBatchInput(longText);
+    expect(result).toEqual([]);
+  });
+
+  it('should handle special characters', () => {
+    const text = '选项A!@#$%\n选项B&*()';
+    const result = parseBatchInput(text);
+    expect(result).toEqual(['选项A!@#$%', '选项B&*()']);
+  });
+});
