@@ -2,7 +2,7 @@
 Pydantic schemas for Experiment model
 """
 from datetime import datetime
-from typing import Any
+from typing import Any, List, Literal, Union, Optional, Dict
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -55,3 +55,90 @@ class Experiment(ExperimentInDB):
     """Schema for experiment responses"""
 
     pass
+
+
+# Choice Option
+class ChoiceOption(BaseModel):
+    id: str
+    label: str
+    value: str
+    order: int
+
+
+# Scale Point for Matrix Questions
+class ScalePoint(BaseModel):
+    value: Union[int, str]
+    label: str
+
+
+class ScaleConfig(BaseModel):
+    type: Literal['preset', 'custom']
+    presetName: Optional[str] = None
+    points: List[ScalePoint]
+    showValue: bool = True
+    showLabel: bool = True
+
+
+# Base Question
+class BaseQuestion(BaseModel):
+    id: str
+    type: str
+    title: str
+    description: Optional[str] = None
+    required: bool = True
+    order: int
+    metadata: Optional[Dict[str, Any]] = None
+
+
+# Single Choice Question
+class SingleChoiceQuestion(BaseQuestion):
+    type: Literal['single'] = 'single'
+    options: List[ChoiceOption] = []
+    layout: Literal['vertical', 'horizontal', 'two-column'] = 'vertical'
+    randomize: bool = False
+
+
+# Multiple Choice Question
+class MultipleChoiceQuestion(BaseQuestion):
+    type: Literal['multiple'] = 'multiple'
+    options: List[ChoiceOption] = []
+    layout: Literal['vertical', 'horizontal', 'two-column'] = 'vertical'
+    randomize: bool = False
+
+
+# Text Input Question
+class TextInputQuestion(BaseModel):
+    type: Literal['text'] = 'text'
+    inputType: Literal['text', 'textarea', 'number'] = 'text'
+    maxLength: Optional[int] = None
+    placeholder: Optional[str] = None
+
+
+# Matrix Item
+class MatrixItem(BaseModel):
+    id: str
+    label: str
+    order: int
+
+
+# Matrix Question
+class MatrixQuestion(BaseModel):
+    id: str
+    type: Literal['matrix'] = 'matrix'
+    title: str
+    description: Optional[str] = None
+    required: bool = True
+    order: int
+    items: List[MatrixItem] = []
+    scale: ScaleConfig
+    layout: Literal['horizontal', 'vertical'] = 'horizontal'
+
+
+# Union type for all questions
+Question = Union[SingleChoiceQuestion, MultipleChoiceQuestion, TextInputQuestion, MatrixQuestion]
+
+
+# Updated Experiment Config
+class ExperimentConfig(BaseModel):
+    questions: List[Dict[str, Any]] = []
+    settings: Optional[Dict[str, Any]] = None

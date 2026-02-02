@@ -132,3 +132,64 @@ def test_experiment_schema_from_model():
     assert experiment.id == 1
     assert experiment.name == "Test Experiment"
     assert experiment.status == "draft"
+
+
+def test_single_choice_question_schema():
+    """Test single choice question structure"""
+    from app.schemas.experiment import SingleChoiceQuestion
+
+    question = {
+        "id": "Q_001",
+        "type": "single",
+        "title": "What is your age?",
+        "description": "Please select one",
+        "required": True,
+        "order": 0,
+        "options": [
+            {"id": "OPT_1", "label": "18-25", "value": "18-25", "order": 0},
+            {"id": "OPT_2", "label": "26-35", "value": "26-35", "order": 1},
+        ],
+        "layout": "vertical",
+        "randomize": False
+    }
+
+    validated = SingleChoiceQuestion(**question)
+    assert validated.title == "What is your age?"
+    assert len(validated.options) == 2
+
+
+def test_matrix_question_schema():
+    """Test matrix question with scale configuration"""
+    from app.schemas.experiment import MatrixQuestion, ScaleConfig
+
+    question = {
+        "id": "Q_002",
+        "type": "matrix",
+        "title": "Rate these aspects",
+        "required": True,
+        "order": 1,
+        "items": [
+            {"id": "ITEM_1", "label": "Quality", "order": 0},
+            {"id": "ITEM_2", "label": "Price", "order": 1},
+        ],
+        "scale": {
+            "type": "preset",
+            "presetName": "7点Likert量表",
+            "points": [
+                {"value": 1, "label": "非常不同意"},
+                {"value": 2, "label": "不同意"},
+                {"value": 3, "label": "有点不同意"},
+                {"value": 4, "label": "中立"},
+                {"value": 5, "label": "有点同意"},
+                {"value": 6, "label": "同意"},
+                {"value": 7, "label": "非常同意"},
+            ],
+            "showValue": True,
+            "showLabel": True
+        },
+        "layout": "horizontal"
+    }
+
+    validated = MatrixQuestion(**question)
+    assert len(validated.items) == 2
+    assert len(validated.scale.points) == 7
