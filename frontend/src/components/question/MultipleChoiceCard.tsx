@@ -17,6 +17,9 @@ interface MultipleChoiceCardProps {
   onAddOption: () => void;
   onUpdateOption: (optionId: string, label: string) => void;
   onDeleteOption: (optionId: string) => void;
+  isBatchSelected: boolean;
+  onBatchToggle: () => void;
+  onReorderClick: () => void;
 }
 
 export default function MultipleChoiceCard({
@@ -29,6 +32,9 @@ export default function MultipleChoiceCard({
   onAddOption,
   onUpdateOption,
   onDeleteOption,
+  isBatchSelected,
+  onBatchToggle,
+  onReorderClick,
 }: MultipleChoiceCardProps) {
   const { batchAddOptions } = useSurveyEditor();
   const [showBatchDialog, setShowBatchDialog] = useState(false);
@@ -82,6 +88,9 @@ export default function MultipleChoiceCard({
       onDuplicate={onDuplicate}
       onDelete={onDelete}
       onUpdateTitle={onUpdateTitle}
+      isBatchSelected={isBatchSelected}
+      onBatchToggle={onBatchToggle}
+      onReorderClick={onReorderClick}
     >
       {/* Options */}
       <div className={`flex ${getLayoutClass()}`}>

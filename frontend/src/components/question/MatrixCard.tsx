@@ -16,6 +16,9 @@ interface MatrixCardProps {
   onAddItem: () => void;
   onUpdateItem: (itemId: string, label: string) => void;
   onDeleteItem: (itemId: string) => void;
+  isBatchSelected: boolean;
+  onBatchToggle: () => void;
+  onReorderClick: () => void;
 }
 
 export default function MatrixCard({
@@ -28,6 +31,9 @@ export default function MatrixCard({
   onAddItem,
   onUpdateItem,
   onDeleteItem,
+  isBatchSelected,
+  onBatchToggle,
+  onReorderClick,
 }: MatrixCardProps) {
   const { batchAddMatrixItems } = useSurveyEditor();
   const [showBatchDialog, setShowBatchDialog] = useState(false);
@@ -96,6 +102,9 @@ export default function MatrixCard({
       onDuplicate={onDuplicate}
       onDelete={onDelete}
       onUpdateTitle={onUpdateTitle}
+      isBatchSelected={isBatchSelected}
+      onBatchToggle={onBatchToggle}
+      onReorderClick={onReorderClick}
     >
       {/* Scale header */}
       <div className="mb-4">

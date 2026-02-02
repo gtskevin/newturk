@@ -8,6 +8,9 @@ interface TextInputCardProps {
   onDuplicate: () => void;
   onDelete: () => void;
   onUpdateTitle: (title: string) => void;
+  isBatchSelected: boolean;
+  onBatchToggle: () => void;
+  onReorderClick: () => void;
 }
 
 export default function TextInputCard({
@@ -17,6 +20,9 @@ export default function TextInputCard({
   onDuplicate,
   onDelete,
   onUpdateTitle,
+  isBatchSelected,
+  onBatchToggle,
+  onReorderClick,
 }: TextInputCardProps) {
   const renderInput = () => {
     const placeholder = question.placeholder || '请输入...';
@@ -63,6 +69,9 @@ export default function TextInputCard({
       onDuplicate={onDuplicate}
       onDelete={onDelete}
       onUpdateTitle={onUpdateTitle}
+      isBatchSelected={isBatchSelected}
+      onBatchToggle={onBatchToggle}
+      onReorderClick={onReorderClick}
     >
       {/* Input preview */}
       <div className="max-w-md">
