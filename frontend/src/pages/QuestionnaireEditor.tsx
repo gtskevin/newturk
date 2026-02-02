@@ -9,6 +9,7 @@ import {
   TextInputCard,
   MatrixCard,
 } from '../components/question';
+import QuestionReorderDialog from '../components/question/QuestionReorderDialog';
 import { Question } from '../types/question';
 import api from '../api/client';
 
@@ -26,11 +27,22 @@ function QuestionnaireEditorContent() {
     updateOption,
     deleteOption,
     addMatrixItem,
+    moveQuestion,
+    moveSelectedQuestions,
+    selectedQuestionIds,
+    toggleQuestionSelection,
   } = useSurveyEditor();
 
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [reorderDialog, setReorderDialog] = useState<{
+    isOpen: boolean;
+    questionId: string | null;
+  }>({
+    isOpen: false,
+    questionId: null,
+  });
 
   // Load experiment
   useEffect(() => {
@@ -109,6 +121,12 @@ function QuestionnaireEditorContent() {
             onAddOption={() => handleAddOption(question.id)}
             onUpdateOption={(optionId, label) => handleUpdateOption(question.id, optionId, label)}
             onDeleteOption={(optionId) => deleteOption(question.id, optionId)}
+            isBatchSelected={selectedQuestionIds.includes(question.id)}
+            onBatchToggle={() => toggleQuestionSelection(question.id)}
+            onReorderClick={() => setReorderDialog({
+              isOpen: true,
+              questionId: question.id
+            })}
           />
         );
       }
@@ -125,6 +143,12 @@ function QuestionnaireEditorContent() {
             onAddOption={() => handleAddOption(question.id)}
             onUpdateOption={(optionId, label) => handleUpdateOption(question.id, optionId, label)}
             onDeleteOption={(optionId) => deleteOption(question.id, optionId)}
+            isBatchSelected={selectedQuestionIds.includes(question.id)}
+            onBatchToggle={() => toggleQuestionSelection(question.id)}
+            onReorderClick={() => setReorderDialog({
+              isOpen: true,
+              questionId: question.id
+            })}
           />
         );
       }
@@ -138,6 +162,12 @@ function QuestionnaireEditorContent() {
             onDuplicate={() => duplicateQuestion(question.id)}
             onDelete={() => deleteQuestion(question.id)}
             onUpdateTitle={(title) => updateQuestion(question.id, { title })}
+            isBatchSelected={selectedQuestionIds.includes(question.id)}
+            onBatchToggle={() => toggleQuestionSelection(question.id)}
+            onReorderClick={() => setReorderDialog({
+              isOpen: true,
+              questionId: question.id
+            })}
           />
         );
       }
@@ -156,6 +186,12 @@ function QuestionnaireEditorContent() {
             onDeleteItem={(itemId) => {
               console.log('Delete item:', itemId);
             }}
+            isBatchSelected={selectedQuestionIds.includes(question.id)}
+            onBatchToggle={() => toggleQuestionSelection(question.id)}
+            onReorderClick={() => setReorderDialog({
+              isOpen: true,
+              questionId: question.id
+            })}
           />
         );
       }
@@ -257,6 +293,28 @@ function QuestionnaireEditorContent() {
           onBatchAddOptions={() => alert('批量添加选项功能即将推出')}
         />
       </div>
+
+      {/* Reorder dialog */}
+      <QuestionReorderDialog
+        isOpen={reorderDialog.isOpen}
+        onClose={() => setReorderDialog({ isOpen: false, questionId: null })}
+        questionId={reorderDialog.questionId || ''}
+        questionOrder={
+          reorderDialog.questionId
+            ? survey.questions.find(q => q.id === reorderDialog.questionId)?.order || 0
+            : 0
+        }
+        totalQuestions={survey.questions.length}
+        selectedCount={selectedQuestionIds.length}
+        onMove={(targetOrder) => {
+          if (selectedQuestionIds.length > 0) {
+            moveSelectedQuestions(targetOrder);
+          } else if (reorderDialog.questionId) {
+            moveQuestion(reorderDialog.questionId, targetOrder);
+          }
+          setReorderDialog({ isOpen: false, questionId: null });
+        }}
+      />
     </div>
   );
 }

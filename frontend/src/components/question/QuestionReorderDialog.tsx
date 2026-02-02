@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface QuestionReorderDialogProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ interface QuestionReorderDialogProps {
 export default function QuestionReorderDialog({
   isOpen,
   onClose,
-  questionId,
+  questionId: _questionId,
   questionOrder,
   totalQuestions,
   selectedCount,
