@@ -28,6 +28,16 @@ cp .env.example .env
 npm run dev
 ```
 
+## Features
+
+- Multiple question types (single choice, multiple choice, text, matrix)
+- Batch operations for options and matrix items
+- Scale configuration with presets
+- **Question reordering with number-based precision** (Phase 4)
+  - Click question numbers to open reorder dialog
+  - Batch selection and movement
+  - Move to specific position, start, or end
+
 ## Development
 
 Backend runs on http://localhost:8000
