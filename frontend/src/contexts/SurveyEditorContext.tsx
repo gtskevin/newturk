@@ -22,6 +22,7 @@ interface SurveyEditorContextType {
   addMatrixItem: (questionId: string, item: Omit<MatrixItem, 'id' | 'order'>) => void;
   batchAddMatrixItems: (questionId: string, itemsText: string, mode: 'append' | 'replace') => void;
   updateScale: (questionId: string, scale: ScaleConfig) => void;
+  applyScaleToQuestions: (questionIds: string[], scale: ScaleConfig) => void;
 
   // Batch operations
   selectedQuestionIds: string[];
@@ -319,6 +320,19 @@ export const SurveyEditorProvider: React.FC<SurveyEditorProviderProps> = ({ chil
     }));
   }, []);
 
+  // Apply scale to multiple questions
+  const applyScaleToQuestions = useCallback((questionIds: string[], scale: ScaleConfig) => {
+    setSurvey(prev => ({
+      ...prev,
+      questions: prev.questions.map(q => {
+        if (questionIds.includes(q.id) && q.type === 'matrix') {
+          return { ...q, scale };
+        }
+        return q;
+      }),
+    }));
+  }, []);
+
   // Toggle question selection
   const toggleQuestionSelection = useCallback((id: string) => {
     setSelectedQuestionIds(prev =>
@@ -371,6 +385,7 @@ export const SurveyEditorProvider: React.FC<SurveyEditorProviderProps> = ({ chil
     addMatrixItem,
     batchAddMatrixItems,
     updateScale,
+    applyScaleToQuestions,
     selectedQuestionIds,
     toggleQuestionSelection,
     clearSelection,
