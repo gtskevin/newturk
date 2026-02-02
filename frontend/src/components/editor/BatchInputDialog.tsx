@@ -1,5 +1,5 @@
 // frontend/src/components/editor/BatchInputDialog.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { parseBatchInput } from '../../lib/batchParser';
 
 interface BatchInputDialogProps {
@@ -20,6 +20,29 @@ export const BatchInputDialog: React.FC<BatchInputDialogProps> = ({
   const [text, setText] = useState('');
   const [mode, setMode] = useState<'append' | 'replace'>('replace');
   const [error, setError] = useState<string>('');
+
+  // Add keyboard support
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    const handleCtrlEnter = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'Enter' && text.trim()) {
+        onPreview(text, mode);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', handleCtrlEnter);
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('keydown', handleCtrlEnter);
+    };
+  }, [isOpen, text, mode, onClose, onPreview]);
 
   const handlePreview = () => {
     if (!text.trim()) {

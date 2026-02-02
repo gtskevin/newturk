@@ -37,6 +37,8 @@ export default function MatrixCard({
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [previewItems, setPreviewItems] = useState<string[]>([]);
   const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleBatchPreview = (text: string, mode: 'append' | 'replace') => {
     const items = parseBatchInput(text);
@@ -51,9 +53,16 @@ export default function MatrixCard({
   };
 
   const handleBatchConfirm = () => {
+    setIsConfirming(true);
     batchAddMatrixItems(question.id, previewItems.join('\n'), batchMode);
     setShowPreviewDialog(false);
+    setShowBatchDialog(false);
     setPreviewItems([]);
+    setIsConfirming(false);
+
+    // Show success message
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const renderScaleHeader = () => {
@@ -195,7 +204,15 @@ export default function MatrixCard({
           setShowBatchDialog(true);
         }}
         onConfirm={handleBatchConfirm}
+        isConfirming={isConfirming}
       />
+
+      {/* Success notification */}
+      {showSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg">
+          已添加 {previewItems.length} 个新评价项
+        </div>
+      )}
     </QuestionCard>
   );
 }
