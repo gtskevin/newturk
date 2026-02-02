@@ -1,6 +1,11 @@
 import { Circle } from 'lucide-react';
+import { useState } from 'react';
 import { SingleChoiceQuestion } from '../../types/question';
 import QuestionCard from './QuestionCard';
+import { BatchInputDialog } from '../editor/BatchInputDialog';
+import { PreviewDialog } from '../editor/PreviewDialog';
+import { parseBatchInput } from '../../lib/batchParser';
+import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
 interface SingleChoiceCardProps {
   question: SingleChoiceQuestion;
@@ -25,6 +30,30 @@ export default function SingleChoiceCard({
   onUpdateOption,
   onDeleteOption,
 }: SingleChoiceCardProps) {
+  const { batchAddOptions } = useSurveyEditor();
+  const [showBatchDialog, setShowBatchDialog] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewItems, setPreviewItems] = useState<string[]>([]);
+  const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
+
+  const handleBatchPreview = (text: string, mode: 'append' | 'replace') => {
+    const items = parseBatchInput(text);
+    if (items.length === 0) {
+      alert('请输入至少一个选项');
+      return;
+    }
+    setPreviewItems(items);
+    setBatchMode(mode);
+    setShowBatchDialog(false);
+    setShowPreviewDialog(true);
+  };
+
+  const handleBatchConfirm = () => {
+    batchAddOptions(question.id, previewItems.join('\n'), batchMode);
+    setShowPreviewDialog(false);
+    setPreviewItems([]);
+  };
+
   const getLayoutClass = () => {
     switch (question.layout) {
       case 'horizontal':
@@ -92,13 +121,32 @@ export default function SingleChoiceCard({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          // TODO: Open batch edit dialog
-          alert('批量编辑功能即将推出');
+          setShowBatchDialog(true);
         }}
-        className="mt-2 ml-4 text-sm text-gray-500 hover:text-gray-700"
+        className="mt-2 ml-4 text-sm text-blue-500 hover:text-blue-700"
       >
         批量编辑
       </button>
+
+      <BatchInputDialog
+        isOpen={showBatchDialog}
+        title="批量添加选项"
+        placeholder="选项一&#10;选项二&#10;选项三"
+        onClose={() => setShowBatchDialog(false)}
+        onPreview={handleBatchPreview}
+      />
+
+      <PreviewDialog
+        isOpen={showPreviewDialog}
+        title="预览 - 将添加以下选项"
+        items={previewItems}
+        mode={batchMode}
+        onClose={() => {
+          setShowPreviewDialog(false);
+          setShowBatchDialog(true);
+        }}
+        onConfirm={handleBatchConfirm}
+      />
     </QuestionCard>
   );
 }
