@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import experiments
 from app.api.v1 import execution
+from app.api.v1 import analysis
 from app.config import settings
 from app.database import init_db
 
@@ -72,3 +73,4 @@ def health_check():
 # Include API routers
 app.include_router(experiments.router, prefix="/api/v1/experiments", tags=["experiments"])
 app.include_router(execution.router, prefix="/api/v1/execution", tags=["execution"])
+app.include_router(analysis.router, prefix="/api/v1/analysis", tags=["analysis"])
