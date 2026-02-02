@@ -8,6 +8,7 @@ interface ScaleApplyDialogProps {
   sourceScale: ScaleConfig;
   sourceQuestionId: string;
   onClose: () => void;
+  onApplied?: (count: number) => void;
 }
 
 interface MatrixQuestionWithCurrent extends MatrixQuestion {
@@ -19,6 +20,7 @@ export default function ScaleApplyDialog({
   sourceScale,
   sourceQuestionId,
   onClose,
+  onApplied,
 }: ScaleApplyDialogProps) {
   const { survey, applyScaleToQuestions } = useSurveyEditor();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -48,6 +50,7 @@ export default function ScaleApplyDialog({
       return;
     }
     applyScaleToQuestions(selectedIds, sourceScale);
+    onApplied?.(selectedIds.length);
     onClose();
   };
 

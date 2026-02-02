@@ -28,6 +28,8 @@ export default function ScaleEditDialog({
   const [scale, setScale] = useState<ScaleConfig>(initialScale);
   const [originalScale, setOriginalScale] = useState<ScaleConfig>(initialScale);
   const [showApplyDialog, setShowApplyDialog] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [appliedCount, setAppliedCount] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -35,6 +37,20 @@ export default function ScaleEditDialog({
       setOriginalScale(initialScale);
     }
   }, [isOpen, initialScale]);
+
+  // Keyboard shortcut: Escape to close
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   // Live update as user edits
   useEffect(() => {
@@ -97,6 +113,12 @@ export default function ScaleEditDialog({
 
   const handleSave = () => {
     onClose();
+  };
+
+  const handleScaleApplied = (count: number) => {
+    setAppliedCount(count);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   if (!isOpen) return null;
@@ -194,9 +216,17 @@ export default function ScaleEditDialog({
             sourceScale={scale}
             sourceQuestionId={questionId}
             onClose={() => setShowApplyDialog(false)}
+            onApplied={handleScaleApplied}
           />
         )}
       </div>
+
+      {/* Success notification */}
+      {showSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
+          已应用量表到 {appliedCount} 个问题
+        </div>
+      )}
     </div>
   );
 }
