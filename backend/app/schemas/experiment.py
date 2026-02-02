@@ -108,17 +108,10 @@ class MultipleChoiceQuestion(BaseQuestion):
 
 # Text Input Question
 class TextInputQuestion(BaseModel):
-    id: str
     type: Literal['text'] = 'text'
-    title: str
-    description: Optional[str] = None
-    required: bool = True
-    order: int
     inputType: Literal['text', 'textarea', 'number'] = 'text'
     maxLength: Optional[int] = None
     placeholder: Optional[str] = None
-    validation: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
 
 
 # Matrix Item
@@ -139,8 +132,13 @@ class MatrixQuestion(BaseModel):
     items: List[MatrixItem] = []
     scale: ScaleConfig
     layout: Literal['horizontal', 'vertical'] = 'horizontal'
-    metadata: Optional[Dict[str, Any]] = None
 
 
 # Union type for all questions
 Question = Union[SingleChoiceQuestion, MultipleChoiceQuestion, TextInputQuestion, MatrixQuestion]
+
+
+# Updated Experiment Config
+class ExperimentConfig(BaseModel):
+    questions: List[Dict[str, Any]] = []
+    settings: Optional[Dict[str, Any]] = None
