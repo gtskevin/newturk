@@ -2,9 +2,7 @@ import { Circle } from 'lucide-react';
 import { useState } from 'react';
 import { MatrixQuestion } from '../../types/question';
 import QuestionCard from './QuestionCard';
-import { BatchInputDialog } from '../editor/BatchInputDialog';
-import { PreviewDialog } from '../editor/PreviewDialog';
-import { ScaleEditDialog } from '../editor/ScaleEditDialog';
+import { BatchInputDialog, PreviewDialog, ScaleEditDialog, ScaleApplyDialog } from '../editor';
 import { parseBatchInput } from '../../lib/batchParser';
 import { useSurveyEditor } from '../../contexts/SurveyEditorContext';
 
@@ -37,6 +35,7 @@ export default function MatrixCard({
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [showScaleDialog, setShowScaleDialog] = useState(false);
+  const [showApplyDialog, setShowApplyDialog] = useState(false);
   const [previewItems, setPreviewItems] = useState<string[]>([]);
   const [batchMode, setBatchMode] = useState<'append' | 'replace'>('replace');
   const [showSuccess, setShowSuccess] = useState(false);
@@ -214,6 +213,17 @@ export default function MatrixCard({
         questionId={question.id}
         initialScale={question.scale}
         onClose={() => setShowScaleDialog(false)}
+        onApplyToAll={() => {
+          setShowScaleDialog(false);
+          setShowApplyDialog(true);
+        }}
+      />
+
+      <ScaleApplyDialog
+        isOpen={showApplyDialog}
+        sourceScale={question.scale}
+        sourceQuestionId={question.id}
+        onClose={() => setShowApplyDialog(false)}
       />
 
       {/* Success notification */}

@@ -6,6 +6,7 @@ import PresetSelector from './scale/PresetSelector';
 import QuickGenerator from './scale/QuickGenerator';
 import PointEditor from './scale/PointEditor';
 import ScalePreview from './scale/ScalePreview';
+import { ScaleApplyDialog } from './index';
 import { generateScale } from '../../lib/scaleInterpolator';
 
 interface ScaleEditDialogProps {
@@ -26,6 +27,7 @@ export default function ScaleEditDialog({
   const { updateScale } = useSurveyEditor();
   const [scale, setScale] = useState<ScaleConfig>(initialScale);
   const [originalScale, setOriginalScale] = useState<ScaleConfig>(initialScale);
+  const [showApplyDialog, setShowApplyDialog] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -178,13 +180,22 @@ export default function ScaleEditDialog({
 
           {onApplyToAll && (
             <button
-              onClick={onApplyToAll}
+              onClick={() => setShowApplyDialog(true)}
               className="px-4 py-2 text-sm bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
             >
               应用到所有矩阵题
             </button>
           )}
         </div>
+
+        {showApplyDialog && onApplyToAll && (
+          <ScaleApplyDialog
+            isOpen={showApplyDialog}
+            sourceScale={scale}
+            sourceQuestionId={questionId}
+            onClose={() => setShowApplyDialog(false)}
+          />
+        )}
       </div>
     </div>
   );
