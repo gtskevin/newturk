@@ -17,6 +17,9 @@ interface SingleChoiceCardProps {
   onAddOption: () => void;
   onUpdateOption: (optionId: string, label: string) => void;
   onDeleteOption: (optionId: string) => void;
+  isBatchSelected: boolean;
+  onBatchToggle: () => void;
+  onReorderClick: () => void;
 }
 
 export default function SingleChoiceCard({
@@ -29,6 +32,9 @@ export default function SingleChoiceCard({
   onAddOption,
   onUpdateOption,
   onDeleteOption,
+  isBatchSelected,
+  onBatchToggle,
+  onReorderClick,
 }: SingleChoiceCardProps) {
   const { batchAddOptions } = useSurveyEditor();
   const [showBatchDialog, setShowBatchDialog] = useState(false);
@@ -82,6 +88,9 @@ export default function SingleChoiceCard({
       onDuplicate={onDuplicate}
       onDelete={onDelete}
       onUpdateTitle={onUpdateTitle}
+      isBatchSelected={isBatchSelected}
+      onBatchToggle={onBatchToggle}
+      onReorderClick={onReorderClick}
     >
       {/* Options */}
       <div className={`flex ${getLayoutClass()}`}>
